@@ -1,0 +1,1332 @@
+# 1 "/home/isaac/zephyrproject/zephyr/misc/empty_file.c"
+# 1 "<built-in>"
+# 1 "<command-line>"
+# 1 "/home/isaac/zephyrproject/zephyr/boards/arm/frdm_k22f/frdm_k22f.dts" 1
+
+
+
+
+
+
+/dts-v1/;
+
+# 1 "/home/isaac/zephyrproject/zephyr/dts/arm/nxp/MK22FN512VLH12.dtsi" 1 3 4
+
+
+
+
+
+
+# 1 "/home/isaac/zephyrproject/zephyr/dts/arm/nxp/nxp_k2x.dtsi" 1 3 4
+
+
+
+
+
+
+# 1 "/home/isaac/zephyrproject/zephyr/dts/common/mem.h" 1 3 4
+# 8 "/home/isaac/zephyrproject/zephyr/dts/arm/nxp/nxp_k2x.dtsi" 2 3 4
+# 1 "/home/isaac/zephyrproject/zephyr/dts/arm/armv7-m.dtsi" 1 3 4
+
+
+# 1 "/home/isaac/zephyrproject/zephyr/dts/common/skeleton.dtsi" 1 3 4
+# 9 "/home/isaac/zephyrproject/zephyr/dts/common/skeleton.dtsi" 3 4
+/ {
+ #address-cells = <1>;
+ #size-cells = <1>;
+ chosen { };
+ aliases { };
+};
+# 4 "/home/isaac/zephyrproject/zephyr/dts/arm/armv7-m.dtsi" 2 3 4
+
+/ {
+ soc {
+  #address-cells = <1>;
+  #size-cells = <1>;
+  compatible = "simple-bus";
+  interrupt-parent = <&nvic>;
+  ranges;
+
+  nvic: interrupt-controller@e000e100 {
+   #address-cells = <1>;
+   compatible = "arm,v7m-nvic";
+   reg = <0xe000e100 0xc00>;
+   interrupt-controller;
+   #interrupt-cells = <2>;
+  };
+
+  systick: timer@e000e010 {
+   compatible = "arm,armv7m-systick";
+   reg = <0xe000e010 0x10>;
+  };
+ };
+};
+# 9 "/home/isaac/zephyrproject/zephyr/dts/arm/nxp/nxp_k2x.dtsi" 2 3 4
+# 1 "/home/isaac/zephyrproject/zephyr/include/dt-bindings/clock/kinetis_sim.h" 1 3 4
+# 10 "/home/isaac/zephyrproject/zephyr/dts/arm/nxp/nxp_k2x.dtsi" 2 3 4
+# 1 "/home/isaac/zephyrproject/zephyr/include/dt-bindings/clock/kinetis_mcg.h" 1 3 4
+# 11 "/home/isaac/zephyrproject/zephyr/dts/arm/nxp/nxp_k2x.dtsi" 2 3 4
+# 1 "/home/isaac/zephyrproject/zephyr/include/dt-bindings/gpio/gpio.h" 1 3 4
+# 12 "/home/isaac/zephyrproject/zephyr/dts/arm/nxp/nxp_k2x.dtsi" 2 3 4
+# 1 "/home/isaac/zephyrproject/zephyr/include/dt-bindings/i2c/i2c.h" 1 3 4
+# 13 "/home/isaac/zephyrproject/zephyr/dts/arm/nxp/nxp_k2x.dtsi" 2 3 4
+
+/ {
+ chosen {
+  zephyr,entropy = &rnga;
+  zephyr,flash-controller = &ftfe;
+ };
+
+ aliases {
+  watchdog0 = &wdog;
+ };
+
+ cpus {
+  #address-cells = <1>;
+  #size-cells = <0>;
+
+  cpu@0 {
+   device_type = "cpu";
+   compatible = "arm,cortex-m4f";
+   reg = <0>;
+  };
+ };
+# 44 "/home/isaac/zephyrproject/zephyr/dts/arm/nxp/nxp_k2x.dtsi" 3 4
+ sram_l: memory@1fff0000 {
+  compatible = "mmio-sram";
+  reg = <0x1fff0000 ((64) * 1024)>;
+ };
+
+ sram0: memory@20000000 {
+  compatible = "mmio-sram";
+  reg = <0x20000000 ((64) * 1024)>;
+ };
+
+ soc {
+  mcg: clock-controller@40064000 {
+   compatible = "nxp,kinetis-mcg";
+   reg = <0x40064000 0xd>;
+   label = "MCG";
+   #clock-cells = <1>;
+  };
+
+  osc: clock-controller@40065000 {
+   compatible = "nxp,k22f-osc";
+   reg = <0x40065000 0x4>;
+
+   enable-external-reference;
+  };
+
+  rtc: rtc@4003d000 {
+   compatible = "nxp,k22f-rtc";
+   reg = <0x4003d000 0x808>;
+   clock-frequency = <32768>;
+  };
+
+  sim: sim@40047000 {
+   compatible = "nxp,kinetis-sim";
+   reg = <0x40047000 0x1060>;
+   label = "SIM";
+   #clock-cells = <3>;
+
+   core_clk {
+    compatible = "fixed-factor-clock";
+    clocks = <&mcg 1>;
+    clock-div = <1>;
+    #clock-cells = <0>;
+   };
+
+   bus_clk {
+    compatible = "fixed-factor-clock";
+    clocks = <&mcg 1>;
+    clock-div = <2>;
+    #clock-cells = <0>;
+   };
+
+   flexbus_clk {
+    compatible = "fixed-factor-clock";
+    clocks = <&mcg 1>;
+    clock-div = <3>;
+    #clock-cells = <0>;
+   };
+
+   flash_clk {
+    compatible = "fixed-factor-clock";
+    clocks = <&mcg 1>;
+    clock-div = <3>;
+    #clock-cells = <0>;
+   };
+  };
+
+  ftfe: flash-controller@40020000 {
+   compatible = "nxp,kinetis-ftfe";
+   label = "FLASH_CTRL";
+   reg = <0x40020000 0x18>;
+   interrupts = <18 0>, <19 0>;
+   interrupt-names = "command-complete", "read-collision";
+
+   #address-cells = <1>;
+   #size-cells = <1>;
+
+   flash0: flash@0 {
+    compatible = "soc-nv-flash";
+    label = "MCUX_FLASH";
+    reg = <0 ((1) * 1024 * 1024)>;
+    erase-block-size = <2048>;
+    write-block-size = <8>;
+   };
+  };
+
+  i2c0: i2c@40066000 {
+   compatible = "nxp,kinetis-i2c";
+   clock-frequency = <100000>;
+   #address-cells = <1>;
+   #size-cells = <0>;
+   reg = <0x40066000 0x1000>;
+   interrupts = <24 0>;
+   clocks = <&sim 2 0x1034 6>;
+   label = "I2C_0";
+   status = "disabled";
+  };
+
+  i2c1: i2c@40067000 {
+   compatible = "nxp,kinetis-i2c";
+   clock-frequency = <100000>;
+   #address-cells = <1>;
+   #size-cells = <0>;
+   reg = <0x40067000 0x1000>;
+   interrupts = <25 0>;
+   clocks = <&sim 2 0x1034 7>;
+   label = "I2C_1";
+   status = "disabled";
+  };
+
+  uart0: uart@4006a000 {
+   compatible = "nxp,kinetis-uart";
+   reg = <0x4006a000 0x1000>;
+   interrupts = <31 0>, <32 0>;
+   interrupt-names = "status", "error";
+   clocks = <&sim 0 0x1034 10>;
+   label = "UART_0";
+
+   status = "disabled";
+  };
+
+  uart1: uart@4006b000 {
+   compatible = "nxp,kinetis-uart";
+   reg = <0x4006b000 0x1000>;
+   interrupts = <33 0>, <34 0>;
+   interrupt-names = "status", "error";
+   clocks = <&sim 0 0x1034 11>;
+   label = "UART_1";
+
+   status = "disabled";
+  };
+
+  uart2: uart@4006c000 {
+   compatible = "nxp,kinetis-uart";
+   reg = <0x4006c000 0x1000>;
+   interrupts = <35 0>, <36 0>;
+   interrupt-names = "status", "error";
+   clocks = <&sim 2 0x1034 12>;
+   label = "UART_2";
+
+   status = "disabled";
+  };
+
+  uart3: uart@4006d000 {
+   compatible = "nxp,kinetis-uart";
+   reg = <0x4006d000 0x1000>;
+   interrupts = <37 0>, <38 0>;
+   interrupt-names = "status", "error";
+   clocks = <&sim 2 0x1034 13>;
+   label = "UART_3";
+
+   status = "disabled";
+  };
+
+  porta: pinmux@40049000 {
+   compatible = "nxp,kinetis-pinmux";
+   reg = <0x40049000 0xd0>;
+   clocks = <&sim 2 0x1038 9>;
+  };
+
+  portb: pinmux@4004a000 {
+   compatible = "nxp,kinetis-pinmux";
+   reg = <0x4004a000 0xd0>;
+   clocks = <&sim 2 0x1038 10>;
+  };
+
+  portc: pinmux@4004b000 {
+   compatible = "nxp,kinetis-pinmux";
+   reg = <0x4004b000 0xd0>;
+   clocks = <&sim 2 0x1038 11>;
+  };
+
+  portd: pinmux@4004c000 {
+   compatible = "nxp,kinetis-pinmux";
+   reg = <0x4004c000 0xd0>;
+   clocks = <&sim 2 0x1038 12>;
+  };
+
+  porte: pinmux@4004d000 {
+   compatible = "nxp,kinetis-pinmux";
+   reg = <0x4004d000 0xd0>;
+   clocks = <&sim 2 0x1038 13>;
+  };
+
+  gpioa: gpio@400ff000 {
+   compatible = "nxp,kinetis-gpio";
+   status = "disabled";
+   reg = <0x400ff000 0x40>;
+   interrupts = <59 2>;
+   label = "GPIO_0";
+   gpio-controller;
+   #gpio-cells = <2>;
+   nxp,kinetis-port = <&porta>;
+  };
+
+  gpiob: gpio@400ff040 {
+   compatible = "nxp,kinetis-gpio";
+   status = "disabled";
+   reg = <0x400ff040 0x40>;
+   interrupts = <60 2>;
+   label = "GPIO_1";
+   gpio-controller;
+   #gpio-cells = <2>;
+   nxp,kinetis-port = <&portb>;
+  };
+
+  gpioc: gpio@400ff080 {
+   compatible = "nxp,kinetis-gpio";
+   status = "disabled";
+   reg = <0x400ff080 0x40>;
+   interrupts = <61 2>;
+   label = "GPIO_2";
+   gpio-controller;
+   #gpio-cells = <2>;
+   nxp,kinetis-port = <&portc>;
+  };
+
+  gpiod: gpio@400ff0c0 {
+   compatible = "nxp,kinetis-gpio";
+   status = "disabled";
+   reg = <0x400ff0c0 0x40>;
+   interrupts = <62 2>;
+   label = "GPIO_3";
+   gpio-controller;
+   #gpio-cells = <2>;
+   nxp,kinetis-port = <&portd>;
+  };
+
+  gpioe: gpio@400ff100 {
+   compatible = "nxp,kinetis-gpio";
+   status = "disabled";
+   reg = <0x400ff100 0x40>;
+   interrupts = <63 2>;
+   label = "GPIO_4";
+   gpio-controller;
+   #gpio-cells = <2>;
+   nxp,kinetis-port = <&porte>;
+  };
+
+  spi0: spi@4002c000 {
+   compatible = "nxp,kinetis-dspi";
+   reg = <0x4002c000 0x88>;
+   interrupts = <26 3>;
+   label = "SPI_0";
+   clocks = <&sim 2 0x103C 12>;
+   #address-cells = <1>;
+   #size-cells = <0>;
+   status = "disabled";
+  };
+
+  spi1: spi@4002d000 {
+   compatible = "nxp,kinetis-dspi";
+   reg = <0x4002d000 0x88>;
+   interrupts = <27 3>;
+   label = "SPI_1";
+   clocks = <&sim 2 0x103C 13>;
+   #address-cells = <1>;
+   #size-cells = <0>;
+   status = "disabled";
+  };
+
+  wdog: watchdog@40052000 {
+   compatible = "nxp,kinetis-wdog";
+   reg = <0x40052000 16>;
+   interrupts = <22 0>;
+   clocks = <&sim 19 0 0>;
+   label = "WDT_0";
+  };
+
+  ftm0: ftm@40038000{
+   compatible = "nxp,kinetis-ftm";
+   reg = <0x40038000 0x98>;
+   interrupts = <42 0>;
+   clocks = <&mcg 0>,
+      <&sim 2 0x103C 24>;
+   prescaler = <16>;
+   label = "FTM_0";
+   status = "disabled";
+  };
+
+  ftm1: ftm@40039000{
+   compatible = "nxp,kinetis-ftm";
+   reg = <0x40039000 0x98>;
+   interrupts = <43 0>;
+   clocks = <&mcg 0>,
+      <&sim 2 0x103C 25>;
+   prescaler = <16>;
+   label = "FTM_1";
+   status = "disabled";
+  };
+
+  ftm2: ftm@4003a000{
+   compatible = "nxp,kinetis-ftm";
+   reg = <0x4003a000 0x98>;
+   interrupts = <44 0>;
+   clocks = <&mcg 0>,
+      <&sim 2 0x103C 26>;
+   prescaler = <16>;
+   label = "FTM_2";
+   status = "disabled";
+  };
+
+  ftm3: ftm@400b9000{
+   compatible = "nxp,kinetis-ftm";
+   reg = <0x400b9000 0x98>;
+   interrupts = <71 0>;
+   clocks = <&mcg 0>,
+      <&sim 2 0x103C 6>;
+   prescaler = <16>;
+   label = "FTM_3";
+   status = "disabled";
+  };
+
+  adc0: adc@4003b000{
+   compatible = "nxp,kinetis-adc16";
+   reg = <0x4003b000 0x70>;
+   interrupts = <39 0>;
+   label = "ADC_0";
+   status = "disabled";
+   #io-channel-cells = <1>;
+  };
+
+  dac0: dac@4003f000 {
+   compatible = "nxp,kinetis-dac";
+   reg = <0x4003f000 0x1000>;
+   interrupts = <56 0>;
+   voltage-reference = <1>;
+   label = "DAC_0";
+   status = "disabled";
+   #io-channel-cells = <1>;
+  };
+
+  dac1: dac@40028000 {
+   compatible = "nxp,kinetis-dac";
+   reg = <0x40028000 0x1000>;
+   interrupts = <72 0>;
+   voltage-reference = <1>;
+   label = "DAC_1";
+   status = "disabled";
+   #io-channel-cells = <1>;
+  };
+
+  usbotg: usbd@40072000 {
+   compatible = "nxp,kinetis-usbd";
+   reg = <0x40072000 0x1000>;
+   interrupts = <53 1>;
+   interrupt-names = "usb_otg";
+   num-bidir-endpoints = <16>;
+   status = "disabled";
+   label = "USBD";
+  };
+
+  rnga: random@40029000 {
+   compatible = "nxp,kinetis-rnga";
+   reg = <0x40029000 0x1000>;
+   status = "okay";
+   interrupts = <23 0>;
+   label = "RNGA";
+  };
+ };
+};
+
+&nvic {
+ arm,num-irq-priority-bits = <4>;
+};
+# 8 "/home/isaac/zephyrproject/zephyr/dts/arm/nxp/MK22FN512VLH12.dtsi" 2 3 4
+
+# 1 "/home/isaac/zephyrproject/modules/hal/nxp/dts/nxp/kinetis/MK22FN512VLH12-pinctrl.dtsi" 1 3 4
+# 16 "/home/isaac/zephyrproject/modules/hal/nxp/dts/nxp/kinetis/MK22FN512VLH12-pinctrl.dtsi" 3 4
+&porta {
+ PTA0: GPIOA_PTA0: gpioa_pta0 {
+  nxp,kinetis-port-pins = < 0 1 >;
+ };
+ UART0_CTS_b_PTA0: uart0_cts_b_pta0 {
+  nxp,kinetis-port-pins = < 0 2 >;
+ };
+ FTM0_CH5_PTA0: ftm0_ch5_pta0 {
+  nxp,kinetis-port-pins = < 0 3 >;
+ };
+ JTAG_TCLK_PTA0: jtag_tclk_pta0 {
+  nxp,kinetis-port-pins = < 0 7 >;
+ };
+ PTA1: GPIOA_PTA1: gpioa_pta1 {
+  nxp,kinetis-port-pins = < 1 1 >;
+ };
+ UART0_RX_PTA1: uart0_rx_pta1 {
+  nxp,kinetis-port-pins = < 1 2 >;
+ };
+ FTM0_CH6_PTA1: ftm0_ch6_pta1 {
+  nxp,kinetis-port-pins = < 1 3 >;
+ };
+ JTAG_TDI_PTA1: jtag_tdi_pta1 {
+  nxp,kinetis-port-pins = < 1 7 >;
+ };
+ PTA2: GPIOA_PTA2: gpioa_pta2 {
+  nxp,kinetis-port-pins = < 2 1 >;
+ };
+ UART0_TX_PTA2: uart0_tx_pta2 {
+  nxp,kinetis-port-pins = < 2 2 >;
+ };
+ FTM0_CH7_PTA2: ftm0_ch7_pta2 {
+  nxp,kinetis-port-pins = < 2 3 >;
+ };
+ JTAG_TDO_PTA2: TRACE_SWO_PTA2: jtag_tdo_pta2 {
+  nxp,kinetis-port-pins = < 2 7 >;
+ };
+ PTA3: GPIOA_PTA3: gpioa_pta3 {
+  nxp,kinetis-port-pins = < 3 1 >;
+ };
+ UART0_RTS_b_PTA3: uart0_rts_b_pta3 {
+  nxp,kinetis-port-pins = < 3 2 >;
+ };
+ FTM0_CH0_PTA3: ftm0_ch0_pta3 {
+  nxp,kinetis-port-pins = < 3 3 >;
+ };
+ JTAG_TMS_PTA3: jtag_tms_pta3 {
+  nxp,kinetis-port-pins = < 3 7 >;
+ };
+ PTA4: GPIOA_PTA4: LLWU_P3_PTA4: gpioa_pta4 {
+  nxp,kinetis-port-pins = < 4 1 >;
+ };
+ FTM0_CH1_PTA4: ftm0_ch1_pta4 {
+  nxp,kinetis-port-pins = < 4 3 >;
+ };
+ NMI_b_PTA4: nmi_b_pta4 {
+  nxp,kinetis-port-pins = < 4 7 >;
+ };
+ PTA5: GPIOA_PTA5: gpioa_pta5 {
+  nxp,kinetis-port-pins = < 5 1 >;
+ };
+ USB_CLKIN_PTA5: usb_clkin_pta5 {
+  nxp,kinetis-port-pins = < 5 2 >;
+ };
+ FTM0_CH2_PTA5: ftm0_ch2_pta5 {
+  nxp,kinetis-port-pins = < 5 3 >;
+ };
+ I2S0_TX_BCLK_PTA5: i2s0_tx_bclk_pta5 {
+  nxp,kinetis-port-pins = < 5 6 >;
+ };
+ JTAG_TRST_b_PTA5: jtag_trst_b_pta5 {
+  nxp,kinetis-port-pins = < 5 7 >;
+ };
+ PTA12: GPIOA_PTA12: gpioa_pta12 {
+  nxp,kinetis-port-pins = < 12 1 >;
+ };
+ FTM1_CH0_PTA12: ftm1_ch0_pta12 {
+  nxp,kinetis-port-pins = < 12 3 >;
+ };
+ I2S0_TXD0_PTA12: i2s0_txd0_pta12 {
+  nxp,kinetis-port-pins = < 12 6 >;
+ };
+ FTM1_QD_PHA_PTA12: ftm1_qd_pha_pta12 {
+  nxp,kinetis-port-pins = < 12 7 >;
+ };
+ PTA13: GPIOA_PTA13: LLWU_P4_PTA13: gpioa_pta13 {
+  nxp,kinetis-port-pins = < 13 1 >;
+ };
+ FTM1_CH1_PTA13: ftm1_ch1_pta13 {
+  nxp,kinetis-port-pins = < 13 3 >;
+ };
+ I2S0_TX_FS_PTA13: i2s0_tx_fs_pta13 {
+  nxp,kinetis-port-pins = < 13 6 >;
+ };
+ FTM1_QD_PHB_PTA13: ftm1_qd_phb_pta13 {
+  nxp,kinetis-port-pins = < 13 7 >;
+ };
+ EXTAL0_PTA18: extal0_pta18 {
+  nxp,kinetis-port-pins = < 18 0 >;
+ };
+ PTA18: GPIOA_PTA18: gpioa_pta18 {
+  nxp,kinetis-port-pins = < 18 1 >;
+ };
+ FTM0_FLT2_PTA18: ftm0_flt2_pta18 {
+  nxp,kinetis-port-pins = < 18 3 >;
+ };
+ FTM_CLKIN0_PTA18: ftm_clkin0_pta18 {
+  nxp,kinetis-port-pins = < 18 4 >;
+ };
+ XTAL0_PTA19: xtal0_pta19 {
+  nxp,kinetis-port-pins = < 19 0 >;
+ };
+ PTA19: GPIOA_PTA19: gpioa_pta19 {
+  nxp,kinetis-port-pins = < 19 1 >;
+ };
+ FTM1_FLT0_PTA19: ftm1_flt0_pta19 {
+  nxp,kinetis-port-pins = < 19 3 >;
+ };
+ FTM_CLKIN1_PTA19: ftm_clkin1_pta19 {
+  nxp,kinetis-port-pins = < 19 4 >;
+ };
+ LPTMR0_ALT1_PTA19: lptmr0_alt1_pta19 {
+  nxp,kinetis-port-pins = < 19 6 >;
+ };
+};
+
+&portb {
+ ADC0_SE8_PTB0: ADC1_SE8_PTB0: adc0_se8_ptb0 {
+  nxp,kinetis-port-pins = < 0 0 >;
+ };
+ PTB0: GPIOB_PTB0: LLWU_P5_PTB0: gpiob_ptb0 {
+  nxp,kinetis-port-pins = < 0 1 >;
+ };
+ I2C0_SCL_PTB0: i2c0_scl_ptb0 {
+  nxp,kinetis-port-pins = < 0 2 >;
+ };
+ FTM1_CH0_PTB0: ftm1_ch0_ptb0 {
+  nxp,kinetis-port-pins = < 0 3 >;
+ };
+ FTM1_QD_PHA_PTB0: ftm1_qd_pha_ptb0 {
+  nxp,kinetis-port-pins = < 0 6 >;
+ };
+ ADC0_SE9_PTB1: ADC1_SE9_PTB1: adc0_se9_ptb1 {
+  nxp,kinetis-port-pins = < 1 0 >;
+ };
+ PTB1: GPIOB_PTB1: gpiob_ptb1 {
+  nxp,kinetis-port-pins = < 1 1 >;
+ };
+ I2C0_SDA_PTB1: i2c0_sda_ptb1 {
+  nxp,kinetis-port-pins = < 1 2 >;
+ };
+ FTM1_CH1_PTB1: ftm1_ch1_ptb1 {
+  nxp,kinetis-port-pins = < 1 3 >;
+ };
+ FTM1_QD_PHB_PTB1: ftm1_qd_phb_ptb1 {
+  nxp,kinetis-port-pins = < 1 6 >;
+ };
+ ADC0_SE12_PTB2: adc0_se12_ptb2 {
+  nxp,kinetis-port-pins = < 2 0 >;
+ };
+ PTB2: GPIOB_PTB2: gpiob_ptb2 {
+  nxp,kinetis-port-pins = < 2 1 >;
+ };
+ I2C0_SCL_PTB2: i2c0_scl_ptb2 {
+  nxp,kinetis-port-pins = < 2 2 >;
+ };
+ UART0_RTS_b_PTB2: uart0_rts_b_ptb2 {
+  nxp,kinetis-port-pins = < 2 3 >;
+ };
+ FTM0_FLT3_PTB2: ftm0_flt3_ptb2 {
+  nxp,kinetis-port-pins = < 2 6 >;
+ };
+ ADC0_SE13_PTB3: adc0_se13_ptb3 {
+  nxp,kinetis-port-pins = < 3 0 >;
+ };
+ PTB3: GPIOB_PTB3: gpiob_ptb3 {
+  nxp,kinetis-port-pins = < 3 1 >;
+ };
+ I2C0_SDA_PTB3: i2c0_sda_ptb3 {
+  nxp,kinetis-port-pins = < 3 2 >;
+ };
+ UART0_CTS_b_PTB3: uart0_cts_b_ptb3 {
+  nxp,kinetis-port-pins = < 3 3 >;
+ };
+ FTM0_FLT0_PTB3: ftm0_flt0_ptb3 {
+  nxp,kinetis-port-pins = < 3 6 >;
+ };
+ PTB16: GPIOB_PTB16: gpiob_ptb16 {
+  nxp,kinetis-port-pins = < 16 1 >;
+ };
+ SPI1_SOUT_PTB16: spi1_sout_ptb16 {
+  nxp,kinetis-port-pins = < 16 2 >;
+ };
+ UART0_RX_PTB16: uart0_rx_ptb16 {
+  nxp,kinetis-port-pins = < 16 3 >;
+ };
+ FTM_CLKIN0_PTB16: ftm_clkin0_ptb16 {
+  nxp,kinetis-port-pins = < 16 4 >;
+ };
+ EWM_IN_PTB16: ewm_in_ptb16 {
+  nxp,kinetis-port-pins = < 16 6 >;
+ };
+ PTB17: GPIOB_PTB17: gpiob_ptb17 {
+  nxp,kinetis-port-pins = < 17 1 >;
+ };
+ SPI1_SIN_PTB17: spi1_sin_ptb17 {
+  nxp,kinetis-port-pins = < 17 2 >;
+ };
+ UART0_TX_PTB17: uart0_tx_ptb17 {
+  nxp,kinetis-port-pins = < 17 3 >;
+ };
+ FTM_CLKIN1_PTB17: ftm_clkin1_ptb17 {
+  nxp,kinetis-port-pins = < 17 4 >;
+ };
+ EWM_OUT_b_PTB17: ewm_out_b_ptb17 {
+  nxp,kinetis-port-pins = < 17 6 >;
+ };
+ PTB18: GPIOB_PTB18: gpiob_ptb18 {
+  nxp,kinetis-port-pins = < 18 1 >;
+ };
+ FTM2_CH0_PTB18: ftm2_ch0_ptb18 {
+  nxp,kinetis-port-pins = < 18 3 >;
+ };
+ I2S0_TX_BCLK_PTB18: i2s0_tx_bclk_ptb18 {
+  nxp,kinetis-port-pins = < 18 4 >;
+ };
+ FTM2_QD_PHA_PTB18: ftm2_qd_pha_ptb18 {
+  nxp,kinetis-port-pins = < 18 6 >;
+ };
+ PTB19: GPIOB_PTB19: gpiob_ptb19 {
+  nxp,kinetis-port-pins = < 19 1 >;
+ };
+ FTM2_CH1_PTB19: ftm2_ch1_ptb19 {
+  nxp,kinetis-port-pins = < 19 3 >;
+ };
+ I2S0_TX_FS_PTB19: i2s0_tx_fs_ptb19 {
+  nxp,kinetis-port-pins = < 19 4 >;
+ };
+ FTM2_QD_PHB_PTB19: ftm2_qd_phb_ptb19 {
+  nxp,kinetis-port-pins = < 19 6 >;
+ };
+};
+
+&portc {
+ ADC0_SE14_PTC0: adc0_se14_ptc0 {
+  nxp,kinetis-port-pins = < 0 0 >;
+ };
+ PTC0: GPIOC_PTC0: gpioc_ptc0 {
+  nxp,kinetis-port-pins = < 0 1 >;
+ };
+ SPI0_PCS4_PTC0: spi0_pcs4_ptc0 {
+  nxp,kinetis-port-pins = < 0 2 >;
+ };
+ PDB0_EXTRG_PTC0: pdb0_extrg_ptc0 {
+  nxp,kinetis-port-pins = < 0 3 >;
+ };
+ USB_SOF_OUT_PTC0: usb_sof_out_ptc0 {
+  nxp,kinetis-port-pins = < 0 4 >;
+ };
+ ADC0_SE15_PTC1: adc0_se15_ptc1 {
+  nxp,kinetis-port-pins = < 1 0 >;
+ };
+ PTC1: GPIOC_PTC1: LLWU_P6_PTC1: gpioc_ptc1 {
+  nxp,kinetis-port-pins = < 1 1 >;
+ };
+ SPI0_PCS3_PTC1: spi0_pcs3_ptc1 {
+  nxp,kinetis-port-pins = < 1 2 >;
+ };
+ UART1_RTS_b_PTC1: uart1_rts_b_ptc1 {
+  nxp,kinetis-port-pins = < 1 3 >;
+ };
+ FTM0_CH0_PTC1: ftm0_ch0_ptc1 {
+  nxp,kinetis-port-pins = < 1 4 >;
+ };
+ I2S0_TXD0_PTC1: i2s0_txd0_ptc1 {
+  nxp,kinetis-port-pins = < 1 6 >;
+ };
+ LPUART0_RTS_b_PTC1: lpuart0_rts_b_ptc1 {
+  nxp,kinetis-port-pins = < 1 7 >;
+ };
+ ADC0_SE4b_PTC2: CMP1_IN0_PTC2: adc0_se4b_ptc2 {
+  nxp,kinetis-port-pins = < 2 0 >;
+ };
+ PTC2: GPIOC_PTC2: gpioc_ptc2 {
+  nxp,kinetis-port-pins = < 2 1 >;
+ };
+ SPI0_PCS2_PTC2: spi0_pcs2_ptc2 {
+  nxp,kinetis-port-pins = < 2 2 >;
+ };
+ UART1_CTS_b_PTC2: uart1_cts_b_ptc2 {
+  nxp,kinetis-port-pins = < 2 3 >;
+ };
+ FTM0_CH1_PTC2: ftm0_ch1_ptc2 {
+  nxp,kinetis-port-pins = < 2 4 >;
+ };
+ I2S0_TX_FS_PTC2: i2s0_tx_fs_ptc2 {
+  nxp,kinetis-port-pins = < 2 6 >;
+ };
+ LPUART0_CTS_b_PTC2: lpuart0_cts_b_ptc2 {
+  nxp,kinetis-port-pins = < 2 7 >;
+ };
+ CMP1_IN1_PTC3: cmp1_in1_ptc3 {
+  nxp,kinetis-port-pins = < 3 0 >;
+ };
+ PTC3: GPIOC_PTC3: LLWU_P7_PTC3: gpioc_ptc3 {
+  nxp,kinetis-port-pins = < 3 1 >;
+ };
+ SPI0_PCS1_PTC3: spi0_pcs1_ptc3 {
+  nxp,kinetis-port-pins = < 3 2 >;
+ };
+ UART1_RX_PTC3: uart1_rx_ptc3 {
+  nxp,kinetis-port-pins = < 3 3 >;
+ };
+ FTM0_CH2_PTC3: ftm0_ch2_ptc3 {
+  nxp,kinetis-port-pins = < 3 4 >;
+ };
+ CLKOUT_PTC3: clkout_ptc3 {
+  nxp,kinetis-port-pins = < 3 5 >;
+ };
+ I2S0_TX_BCLK_PTC3: i2s0_tx_bclk_ptc3 {
+  nxp,kinetis-port-pins = < 3 6 >;
+ };
+ LPUART0_RX_PTC3: lpuart0_rx_ptc3 {
+  nxp,kinetis-port-pins = < 3 7 >;
+ };
+ PTC4: GPIOC_PTC4: LLWU_P8_PTC4: gpioc_ptc4 {
+  nxp,kinetis-port-pins = < 4 1 >;
+ };
+ SPI0_PCS0_PTC4: spi0_pcs0_ptc4 {
+  nxp,kinetis-port-pins = < 4 2 >;
+ };
+ UART1_TX_PTC4: uart1_tx_ptc4 {
+  nxp,kinetis-port-pins = < 4 3 >;
+ };
+ FTM0_CH3_PTC4: ftm0_ch3_ptc4 {
+  nxp,kinetis-port-pins = < 4 4 >;
+ };
+ CMP1_OUT_PTC4: cmp1_out_ptc4 {
+  nxp,kinetis-port-pins = < 4 6 >;
+ };
+ LPUART0_TX_PTC4: lpuart0_tx_ptc4 {
+  nxp,kinetis-port-pins = < 4 7 >;
+ };
+ PTC5: GPIOC_PTC5: LLWU_P9_PTC5: gpioc_ptc5 {
+  nxp,kinetis-port-pins = < 5 1 >;
+ };
+ SPI0_SCK_PTC5: spi0_sck_ptc5 {
+  nxp,kinetis-port-pins = < 5 2 >;
+ };
+ LPTMR0_ALT2_PTC5: lptmr0_alt2_ptc5 {
+  nxp,kinetis-port-pins = < 5 3 >;
+ };
+ I2S0_RXD0_PTC5: i2s0_rxd0_ptc5 {
+  nxp,kinetis-port-pins = < 5 4 >;
+ };
+ CMP0_OUT_PTC5: cmp0_out_ptc5 {
+  nxp,kinetis-port-pins = < 5 6 >;
+ };
+ FTM0_CH2_PTC5: ftm0_ch2_ptc5 {
+  nxp,kinetis-port-pins = < 5 7 >;
+ };
+ CMP0_IN0_PTC6: cmp0_in0_ptc6 {
+  nxp,kinetis-port-pins = < 6 0 >;
+ };
+ PTC6: GPIOC_PTC6: LLWU_P10_PTC6: gpioc_ptc6 {
+  nxp,kinetis-port-pins = < 6 1 >;
+ };
+ SPI0_SOUT_PTC6: spi0_sout_ptc6 {
+  nxp,kinetis-port-pins = < 6 2 >;
+ };
+ PDB0_EXTRG_PTC6: pdb0_extrg_ptc6 {
+  nxp,kinetis-port-pins = < 6 3 >;
+ };
+ I2S0_RX_BCLK_PTC6: i2s0_rx_bclk_ptc6 {
+  nxp,kinetis-port-pins = < 6 4 >;
+ };
+ I2S0_MCLK_PTC6: i2s0_mclk_ptc6 {
+  nxp,kinetis-port-pins = < 6 6 >;
+ };
+ CMP0_IN1_PTC7: cmp0_in1_ptc7 {
+  nxp,kinetis-port-pins = < 7 0 >;
+ };
+ PTC7: GPIOC_PTC7: gpioc_ptc7 {
+  nxp,kinetis-port-pins = < 7 1 >;
+ };
+ SPI0_SIN_PTC7: spi0_sin_ptc7 {
+  nxp,kinetis-port-pins = < 7 2 >;
+ };
+ USB_SOF_OUT_PTC7: usb_sof_out_ptc7 {
+  nxp,kinetis-port-pins = < 7 3 >;
+ };
+ I2S0_RX_FS_PTC7: i2s0_rx_fs_ptc7 {
+  nxp,kinetis-port-pins = < 7 4 >;
+ };
+ ADC1_SE4b_PTC8: CMP0_IN2_PTC8: adc1_se4b_ptc8 {
+  nxp,kinetis-port-pins = < 8 0 >;
+ };
+ PTC8: GPIOC_PTC8: gpioc_ptc8 {
+  nxp,kinetis-port-pins = < 8 1 >;
+ };
+ FTM3_CH4_PTC8: ftm3_ch4_ptc8 {
+  nxp,kinetis-port-pins = < 8 3 >;
+ };
+ I2S0_MCLK_PTC8: i2s0_mclk_ptc8 {
+  nxp,kinetis-port-pins = < 8 4 >;
+ };
+ ADC1_SE5b_PTC9: CMP0_IN3_PTC9: adc1_se5b_ptc9 {
+  nxp,kinetis-port-pins = < 9 0 >;
+ };
+ PTC9: GPIOC_PTC9: gpioc_ptc9 {
+  nxp,kinetis-port-pins = < 9 1 >;
+ };
+ FTM3_CH5_PTC9: ftm3_ch5_ptc9 {
+  nxp,kinetis-port-pins = < 9 3 >;
+ };
+ I2S0_RX_BCLK_PTC9: i2s0_rx_bclk_ptc9 {
+  nxp,kinetis-port-pins = < 9 4 >;
+ };
+ FTM2_FLT0_PTC9: ftm2_flt0_ptc9 {
+  nxp,kinetis-port-pins = < 9 6 >;
+ };
+ ADC1_SE6b_PTC10: adc1_se6b_ptc10 {
+  nxp,kinetis-port-pins = < 10 0 >;
+ };
+ PTC10: GPIOC_PTC10: gpioc_ptc10 {
+  nxp,kinetis-port-pins = < 10 1 >;
+ };
+ I2C1_SCL_PTC10: i2c1_scl_ptc10 {
+  nxp,kinetis-port-pins = < 10 2 >;
+ };
+ FTM3_CH6_PTC10: ftm3_ch6_ptc10 {
+  nxp,kinetis-port-pins = < 10 3 >;
+ };
+ I2S0_RX_FS_PTC10: i2s0_rx_fs_ptc10 {
+  nxp,kinetis-port-pins = < 10 4 >;
+ };
+ ADC1_SE7b_PTC11: adc1_se7b_ptc11 {
+  nxp,kinetis-port-pins = < 11 0 >;
+ };
+ PTC11: GPIOC_PTC11: LLWU_P11_PTC11: gpioc_ptc11 {
+  nxp,kinetis-port-pins = < 11 1 >;
+ };
+ I2C1_SDA_PTC11: i2c1_sda_ptc11 {
+  nxp,kinetis-port-pins = < 11 2 >;
+ };
+ FTM3_CH7_PTC11: ftm3_ch7_ptc11 {
+  nxp,kinetis-port-pins = < 11 3 >;
+ };
+};
+
+&portd {
+ PTD0: GPIOD_PTD0: LLWU_P12_PTD0: gpiod_ptd0 {
+  nxp,kinetis-port-pins = < 0 1 >;
+ };
+ SPI0_PCS0_PTD0: spi0_pcs0_ptd0 {
+  nxp,kinetis-port-pins = < 0 2 >;
+ };
+ UART2_RTS_b_PTD0: uart2_rts_b_ptd0 {
+  nxp,kinetis-port-pins = < 0 3 >;
+ };
+ FTM3_CH0_PTD0: ftm3_ch0_ptd0 {
+  nxp,kinetis-port-pins = < 0 4 >;
+ };
+ LPUART0_RTS_b_PTD0: lpuart0_rts_b_ptd0 {
+  nxp,kinetis-port-pins = < 0 6 >;
+ };
+ ADC0_SE5b_PTD1: adc0_se5b_ptd1 {
+  nxp,kinetis-port-pins = < 1 0 >;
+ };
+ PTD1: GPIOD_PTD1: gpiod_ptd1 {
+  nxp,kinetis-port-pins = < 1 1 >;
+ };
+ SPI0_SCK_PTD1: spi0_sck_ptd1 {
+  nxp,kinetis-port-pins = < 1 2 >;
+ };
+ UART2_CTS_b_PTD1: uart2_cts_b_ptd1 {
+  nxp,kinetis-port-pins = < 1 3 >;
+ };
+ FTM3_CH1_PTD1: ftm3_ch1_ptd1 {
+  nxp,kinetis-port-pins = < 1 4 >;
+ };
+ LPUART0_CTS_b_PTD1: lpuart0_cts_b_ptd1 {
+  nxp,kinetis-port-pins = < 1 6 >;
+ };
+ PTD2: GPIOD_PTD2: LLWU_P13_PTD2: gpiod_ptd2 {
+  nxp,kinetis-port-pins = < 2 1 >;
+ };
+ SPI0_SOUT_PTD2: spi0_sout_ptd2 {
+  nxp,kinetis-port-pins = < 2 2 >;
+ };
+ UART2_RX_PTD2: uart2_rx_ptd2 {
+  nxp,kinetis-port-pins = < 2 3 >;
+ };
+ FTM3_CH2_PTD2: ftm3_ch2_ptd2 {
+  nxp,kinetis-port-pins = < 2 4 >;
+ };
+ LPUART0_RX_PTD2: lpuart0_rx_ptd2 {
+  nxp,kinetis-port-pins = < 2 6 >;
+ };
+ I2C0_SCL_PTD2: i2c0_scl_ptd2 {
+  nxp,kinetis-port-pins = < 2 7 >;
+ };
+ PTD3: GPIOD_PTD3: gpiod_ptd3 {
+  nxp,kinetis-port-pins = < 3 1 >;
+ };
+ SPI0_SIN_PTD3: spi0_sin_ptd3 {
+  nxp,kinetis-port-pins = < 3 2 >;
+ };
+ UART2_TX_PTD3: uart2_tx_ptd3 {
+  nxp,kinetis-port-pins = < 3 3 >;
+ };
+ FTM3_CH3_PTD3: ftm3_ch3_ptd3 {
+  nxp,kinetis-port-pins = < 3 4 >;
+ };
+ LPUART0_TX_PTD3: lpuart0_tx_ptd3 {
+  nxp,kinetis-port-pins = < 3 6 >;
+ };
+ I2C0_SDA_PTD3: i2c0_sda_ptd3 {
+  nxp,kinetis-port-pins = < 3 7 >;
+ };
+ PTD4: GPIOD_PTD4: LLWU_P14_PTD4: gpiod_ptd4 {
+  nxp,kinetis-port-pins = < 4 1 >;
+ };
+ SPI0_PCS1_PTD4: spi0_pcs1_ptd4 {
+  nxp,kinetis-port-pins = < 4 2 >;
+ };
+ UART0_RTS_b_PTD4: uart0_rts_b_ptd4 {
+  nxp,kinetis-port-pins = < 4 3 >;
+ };
+ FTM0_CH4_PTD4: ftm0_ch4_ptd4 {
+  nxp,kinetis-port-pins = < 4 4 >;
+ };
+ EWM_IN_PTD4: ewm_in_ptd4 {
+  nxp,kinetis-port-pins = < 4 6 >;
+ };
+ SPI1_PCS0_PTD4: spi1_pcs0_ptd4 {
+  nxp,kinetis-port-pins = < 4 7 >;
+ };
+ ADC0_SE6b_PTD5: adc0_se6b_ptd5 {
+  nxp,kinetis-port-pins = < 5 0 >;
+ };
+ PTD5: GPIOD_PTD5: gpiod_ptd5 {
+  nxp,kinetis-port-pins = < 5 1 >;
+ };
+ SPI0_PCS2_PTD5: spi0_pcs2_ptd5 {
+  nxp,kinetis-port-pins = < 5 2 >;
+ };
+ UART0_CTS_b_PTD5: uart0_cts_b_ptd5 {
+  nxp,kinetis-port-pins = < 5 3 >;
+ };
+ FTM0_CH5_PTD5: ftm0_ch5_ptd5 {
+  nxp,kinetis-port-pins = < 5 4 >;
+ };
+ EWM_OUT_b_PTD5: ewm_out_b_ptd5 {
+  nxp,kinetis-port-pins = < 5 6 >;
+ };
+ SPI1_SCK_PTD5: spi1_sck_ptd5 {
+  nxp,kinetis-port-pins = < 5 7 >;
+ };
+ ADC0_SE7b_PTD6: adc0_se7b_ptd6 {
+  nxp,kinetis-port-pins = < 6 0 >;
+ };
+ PTD6: GPIOD_PTD6: LLWU_P15_PTD6: gpiod_ptd6 {
+  nxp,kinetis-port-pins = < 6 1 >;
+ };
+ SPI0_PCS3_PTD6: spi0_pcs3_ptd6 {
+  nxp,kinetis-port-pins = < 6 2 >;
+ };
+ UART0_RX_PTD6: uart0_rx_ptd6 {
+  nxp,kinetis-port-pins = < 6 3 >;
+ };
+ FTM0_CH6_PTD6: ftm0_ch6_ptd6 {
+  nxp,kinetis-port-pins = < 6 4 >;
+ };
+ FTM0_FLT0_PTD6: ftm0_flt0_ptd6 {
+  nxp,kinetis-port-pins = < 6 6 >;
+ };
+ SPI1_SOUT_PTD6: spi1_sout_ptd6 {
+  nxp,kinetis-port-pins = < 6 7 >;
+ };
+ PTD7: GPIOD_PTD7: gpiod_ptd7 {
+  nxp,kinetis-port-pins = < 7 1 >;
+ };
+ UART0_TX_PTD7: uart0_tx_ptd7 {
+  nxp,kinetis-port-pins = < 7 3 >;
+ };
+ FTM0_CH7_PTD7: ftm0_ch7_ptd7 {
+  nxp,kinetis-port-pins = < 7 4 >;
+ };
+ FTM0_FLT1_PTD7: ftm0_flt1_ptd7 {
+  nxp,kinetis-port-pins = < 7 6 >;
+ };
+ SPI1_SIN_PTD7: spi1_sin_ptd7 {
+  nxp,kinetis-port-pins = < 7 7 >;
+ };
+};
+
+&porte {
+ ADC1_SE4a_PTE0: adc1_se4a_pte0 {
+  nxp,kinetis-port-pins = < 0 0 >;
+ };
+ PTE0: GPIOE_PTE0: CLKOUT32K_PTE0: gpioe_pte0 {
+  nxp,kinetis-port-pins = < 0 1 >;
+ };
+ SPI1_PCS1_PTE0: spi1_pcs1_pte0 {
+  nxp,kinetis-port-pins = < 0 2 >;
+ };
+ UART1_TX_PTE0: uart1_tx_pte0 {
+  nxp,kinetis-port-pins = < 0 3 >;
+ };
+ I2C1_SDA_PTE0: i2c1_sda_pte0 {
+  nxp,kinetis-port-pins = < 0 6 >;
+ };
+ RTC_CLKOUT_PTE0: rtc_clkout_pte0 {
+  nxp,kinetis-port-pins = < 0 7 >;
+ };
+ ADC1_SE5a_PTE1: adc1_se5a_pte1 {
+  nxp,kinetis-port-pins = < 1 0 >;
+ };
+ PTE1: GPIOE_PTE1: LLWU_P0_PTE1: gpioe_pte1 {
+  nxp,kinetis-port-pins = < 1 1 >;
+ };
+ SPI1_SOUT_PTE1: spi1_sout_pte1 {
+  nxp,kinetis-port-pins = < 1 2 >;
+ };
+ UART1_RX_PTE1: uart1_rx_pte1 {
+  nxp,kinetis-port-pins = < 1 3 >;
+ };
+ I2C1_SCL_PTE1: i2c1_scl_pte1 {
+  nxp,kinetis-port-pins = < 1 6 >;
+ };
+ SPI1_SIN_PTE1: spi1_sin_pte1 {
+  nxp,kinetis-port-pins = < 1 7 >;
+ };
+};
+# 10 "/home/isaac/zephyrproject/zephyr/dts/arm/nxp/MK22FN512VLH12.dtsi" 2 3 4
+# 10 "/home/isaac/zephyrproject/zephyr/boards/arm/frdm_k22f/frdm_k22f.dts" 2
+# 1 "/home/isaac/zephyrproject/zephyr/include/dt-bindings/pwm/pwm.h" 1 3 4
+# 11 "/home/isaac/zephyrproject/zephyr/boards/arm/frdm_k22f/frdm_k22f.dts" 2
+
+/ {
+ model = "NXP Freedom MK22F board";
+ compatible = "nxp,mk22f12", "nxp,k22f", "nxp,k2x";
+
+ aliases {
+  led0 = &green_led;
+  led1 = &blue_led;
+  led2 = &red_led;
+  sw0 = &user_button_3;
+  sw1 = &user_button_2;
+  pwm-led0 = &green_pwm_led;
+  green-pwm-led = &green_pwm_led;
+  blue-pwm-led = &blue_pwm_led;
+  red-pwm-led = &red_pwm_led;
+ };
+
+ chosen {
+  zephyr,sram = &sram0;
+  zephyr,flash = &flash0;
+  zephyr,code-partition = &slot0_partition;
+  zephyr,console = &uart1;
+  zephyr,shell-uart = &uart1;
+  zephyr,uart-pipe = &uart1;
+ };
+
+ leds {
+  compatible = "gpio-leds";
+  red_led: led_0 {
+   gpios = <&gpioa 1 0>;
+   label = "User LD1";
+  };
+  green_led: led_1 {
+   gpios = <&gpioa 2 0>;
+   label = "User LD2";
+  };
+  blue_led: led_2 {
+   gpios = <&gpiod 5 0>;
+   label = "User LD3";
+  };
+ };
+
+ pwmleds {
+  compatible = "pwm-leds";
+
+  red_pwm_led: red_pwm_led {
+   label = "red_led";
+   pwms = <&ftm0 6 15625000 (1 << 0)>;
+  };
+  green_pwm_led: green_pwm_led {
+   label = "green_led";
+   pwms = <&ftm0 7 15625000 (1 << 0)>;
+  };
+  blue_pwm_led: blue_pwm_led {
+   label = "blue_led";
+   pwms = <&ftm0 5 15625000 (1 << 0)>;
+  };
+ };
+
+ gpio_keys {
+  compatible = "gpio-keys";
+  user_button_2: button_0 {
+   label = "User SW2";
+   gpios = <&gpioc 1 (1 << 0)>;
+  };
+  user_button_3: button_1 {
+   label = "User SW3";
+   gpios = <&gpiob 17 (1 << 0)>;
+  };
+ };
+
+ arduino_header: connector {
+  compatible = "arduino-header-r3";
+  #gpio-cells = <2>;
+  gpio-map-mask = <0xffffffff 0xffffffc0>;
+  gpio-map-pass-thru = <0 0x3f>;
+  gpio-map = <0 0 &gpiob 0 0>,
+      <1 0 &gpiob 1 0>,
+      <2 0 &gpioc 1 0>,
+      <3 0 &gpioc 2 0>,
+      <4 0 &gpiob 3 0>,
+      <5 0 &gpiob 2 0>,
+      <6 0 &gpiod 2 0>,
+      <7 0 &gpiod 3 0>,
+      <8 0 &gpiob 16 0>,
+      <9 0 &gpioa 2 0>,
+      <10 0 &gpioa 4 0>,
+      <11 0 &gpiob 18 0>,
+      <12 0 &gpioc 3 0>,
+      <13 0 &gpioc 6 0>,
+      <14 0 &gpiob 19 0>,
+      <15 0 &gpioa 1 0>,
+      <16 0 &gpiod 4 0>,
+      <17 0 &gpiod 6 0>,
+      <18 0 &gpiod 7 0>,
+      <19 0 &gpiod 5 0>,
+      <20 0 &gpioe 0 0>,
+      <21 0 &gpioe 1 0>;
+ };
+};
+
+&sim {
+ pllfll-select = <1>;
+ er32k-select = <2>;
+};
+
+&adc0 {
+ status = "okay";
+};
+
+&dac0 {
+ status = "okay";
+ voltage-reference = <2>;
+};
+arduino_i2c: &i2c0 {
+ status = "okay";
+ pinctrl-0 = <&I2C0_SCL_PTB2 &I2C0_SDA_PTB3>;
+ pinctrl-names = "default";
+
+ fxos8700@1c {
+  compatible = "nxp,fxos8700";
+  reg = <0x1c>;
+  label = "FXOS8700";
+  int1-gpios = <&gpiod 0 (1 << 0)>;
+  int2-gpios = <&gpiod 1 (1 << 0)>;
+ };
+};
+
+&I2C0_SCL_PTB2 {
+ drive-open-drain;
+};
+
+&I2C0_SDA_PTB3 {
+ drive-open-drain;
+};
+
+arduino_spi: &spi0 {
+ status = "okay";
+ pinctrl-0 = <&SPI0_PCS4_PTC0 &SPI0_SCK_PTD1
+       &SPI0_SOUT_PTD2 &SPI0_SIN_PTD3>;
+ pinctrl-names = "default";
+};
+
+&ftm0 {
+ status = "okay";
+ compatible = "nxp,kinetis-ftm-pwm";
+ #pwm-cells = <3>;
+ pinctrl-0 = <&FTM0_CH6_PTA1 &FTM0_CH7_PTA2 &FTM0_CH5_PTD5>;
+ pinctrl-names = "default";
+};
+
+&uart1 {
+ status = "okay";
+ current-speed = <115200>;
+ pinctrl-0 = <&UART1_RX_PTE1 &UART1_TX_PTE0>;
+ pinctrl-names = "default";
+};
+
+&uart2 {
+ pinctrl-0 = <&UART2_RX_PTD2 &UART2_TX_PTD3>;
+ pinctrl-names = "default";
+};
+
+zephyr_udc0: &usbotg {
+ compatible = "nxp,kinetis-usbd";
+ status = "okay";
+ num-bidir-endpoints = <8>;
+};
+
+&gpioa {
+ status = "okay";
+};
+
+&gpiob {
+ status = "okay";
+};
+
+&gpioc {
+ status = "okay";
+};
+
+&gpiod {
+ status = "okay";
+};
+
+&gpioe {
+ status = "okay";
+};
+
+&flash0 {
+
+
+
+
+ partitions {
+  compatible = "fixed-partitions";
+  #address-cells = <1>;
+  #size-cells = <1>;
+
+  boot_partition: partition@0 {
+   label = "mcuboot";
+   reg = <0x00000000 0x00010000>;
+   read-only;
+  };
+  slot0_partition: partition@10000 {
+   label = "image-0";
+   reg = <0x00010000 0x00020000>;
+  };
+  slot1_partition: partition@30000 {
+   label = "image-1";
+   reg = <0x00030000 0x00020000>;
+  };
+  scratch_partition: partition@50000 {
+   label = "image-scratch";
+   reg = <0x00050000 0x00010000>;
+  };
+
+
+
+
+
+
+  storage_partition: partition@60000 {
+   label = "storage";
+   reg = <0x00060000 0x00020000>;
+  };
+
+ };
+};
+# 1 "<command-line>" 2
+# 1 "/home/isaac/zephyrproject/zephyr/misc/empty_file.c"
